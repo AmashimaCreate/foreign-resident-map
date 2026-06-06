@@ -7,12 +7,16 @@ on:
     - cron: "0 0 1 * *"   # 毎月1日 00:00 UTC
   workflow_dispatch:
     inputs:
+      discover:
+        description: "true なら getStatsList で候補statsDataIdを一覧表示（JSONは生成しない）"
+        required: false
+        default: "false"
       zairyu_stats_id:
-        description: "在留外国人 statsDataId（空ならコード既定値 0003147229 を使用）"
+        description: "在留外国人 statsDataId（空ならコード既定値を使用）"
         required: false
         default: ""
       pop_stats_id:
-        description: "人口推計 statsDataId（空ならコード既定値 0004010044 を使用）"
+        description: "人口推計 statsDataId（空ならコード既定値を使用）"
         required: false
         default: ""
 
@@ -39,7 +43,12 @@ jobs:
           ESTAT_APP_ID: ${{ secrets.ESTAT_APP_ID }}
           ZAIRYU_STATS_ID: ${{ github.event.inputs.zairyu_stats_id }}
           POP_STATS_ID: ${{ github.event.inputs.pop_stats_id }}
-        run: python build_data.py
+        run: |
+          if [ "${{ github.event.inputs.discover }}" = "true" ]; then
+            python build_data.py --discover
+          else
+            python build_data.py
+          fi
 
       # 生成物を成果物として保存（コミット有無に関わらず中身を確認できるように）
       - name: Upload JSON artifact
