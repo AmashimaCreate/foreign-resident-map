@@ -1,16 +1,18 @@
 {
-  "generated_at": "2026-06-06T02:01:48+09:00",
+  "generated_at": "2026-06-06T02:22:45+09:00",
   "scope": "prefecture",
   "source": {
     "foreign": {
       "provider": "出入国在留管理庁 在留外国人統計（e-Stat API）",
       "statsDataId": "0003147229",
-      "time": "2017000606"
+      "time": "2017000606",
+      "unit": "人"
     },
     "population": {
       "provider": "総務省 人口推計（e-Stat API）",
-      "statsDataId": "0004010044",
-      "time": "2009000000"
+      "statsDataId": "0003448232",
+      "time": "2024000000",
+      "unit": "千人"
     }
   },
   "note": "比率＝在留外国人数(最新時点) ÷ 総人口(最新時点) × 100。両者の時点が数か月ずれるため概算。都道府県レベルのみ（市区町村はAPI対象外）。",
@@ -19,330 +21,330 @@
       "code": "01",
       "name": "北海道",
       "foreign": 29750,
-      "pop": 5507,
-      "ratio": 540.222
+      "pop": 5043000,
+      "ratio": 0.59
     },
     {
       "code": "02",
       "name": "青森県",
       "foreign": 4912,
-      "pop": 1379,
-      "ratio": 356.2
+      "pop": 1165000,
+      "ratio": 0.422
     },
     {
       "code": "03",
       "name": "岩手県",
       "foreign": 6460,
-      "pop": 1340,
-      "ratio": 482.09
+      "pop": 1145000,
+      "ratio": 0.564
     },
     {
       "code": "04",
       "name": "宮城県",
       "foreign": 19417,
-      "pop": 2336,
-      "ratio": 831.207
+      "pop": 2248000,
+      "ratio": 0.864
     },
     {
       "code": "05",
       "name": "秋田県",
       "foreign": 3812,
-      "pop": 1096,
-      "ratio": 347.81
+      "pop": 897000,
+      "ratio": 0.425
     },
     {
       "code": "06",
       "name": "山形県",
       "foreign": 6628,
-      "pop": 1179,
-      "ratio": 562.171
+      "pop": 1011000,
+      "ratio": 0.656
     },
     {
       "code": "07",
       "name": "福島県",
       "foreign": 12518,
-      "pop": 2040,
-      "ratio": 613.627
+      "pop": 1743000,
+      "ratio": 0.718
     },
     {
       "code": "08",
       "name": "茨城県",
       "foreign": 60163,
-      "pop": 2960,
-      "ratio": 2032.534
+      "pop": 2806000,
+      "ratio": 2.144
     },
     {
       "code": "09",
       "name": "栃木県",
       "foreign": 38618,
-      "pop": 2006,
-      "ratio": 1925.125
+      "pop": 1885000,
+      "ratio": 2.049
     },
     {
       "code": "10",
       "name": "群馬県",
       "foreign": 52979,
-      "pop": 2007,
-      "ratio": 2639.711
+      "pop": 1890000,
+      "ratio": 2.803
     },
     {
       "code": "11",
       "name": "埼玉県",
       "foreign": 160026,
-      "pop": 7130,
-      "ratio": 2244.404
+      "pop": 7332000,
+      "ratio": 2.183
     },
     {
       "code": "12",
       "name": "千葉県",
       "foreign": 139823,
-      "pop": 6139,
-      "ratio": 2277.619
+      "pop": 6251000,
+      "ratio": 2.237
     },
     {
       "code": "13",
       "name": "東京都",
       "foreign": 521088,
-      "pop": 12868,
-      "ratio": 4049.487
+      "pop": 14178000,
+      "ratio": 3.675
     },
     {
       "code": "14",
       "name": "神奈川県",
       "foreign": 198557,
-      "pop": 8943,
-      "ratio": 2220.25
+      "pop": 9225000,
+      "ratio": 2.152
     },
     {
       "code": "15",
       "name": "新潟県",
       "foreign": 14892,
-      "pop": 2378,
-      "ratio": 626.241
+      "pop": 2099000,
+      "ratio": 0.709
     },
     {
       "code": "16",
       "name": "富山県",
       "foreign": 15798,
-      "pop": 1095,
-      "ratio": 1442.74
+      "pop": 997000,
+      "ratio": 1.585
     },
     {
       "code": "17",
       "name": "石川県",
       "foreign": 13247,
-      "pop": 1165,
-      "ratio": 1137.082
+      "pop": 1098000,
+      "ratio": 1.206
     },
     {
       "code": "18",
       "name": "福井県",
       "foreign": 13203,
-      "pop": 808,
-      "ratio": 1634.035
+      "pop": 739000,
+      "ratio": 1.787
     },
     {
       "code": "19",
       "name": "山梨県",
       "foreign": 15079,
-      "pop": 867,
-      "ratio": 1739.216
+      "pop": 791000,
+      "ratio": 1.906
     },
     {
       "code": "20",
       "name": "長野県",
       "foreign": 33518,
-      "pop": 2159,
-      "ratio": 1552.478
+      "pop": 1987000,
+      "ratio": 1.687
     },
     {
       "code": "21",
       "name": "岐阜県",
       "foreign": 49649,
-      "pop": 2092,
-      "ratio": 2373.279
+      "pop": 1916000,
+      "ratio": 2.591
     },
     {
       "code": "22",
       "name": "静岡県",
       "foreign": 83093,
-      "pop": 3792,
-      "ratio": 2191.271
+      "pop": 3527000,
+      "ratio": 2.356
     },
     {
       "code": "23",
       "name": "愛知県",
       "foreign": 234330,
-      "pop": 7418,
-      "ratio": 3158.938
+      "pop": 7460000,
+      "ratio": 3.141
     },
     {
       "code": "24",
       "name": "三重県",
       "foreign": 46176,
-      "pop": 1870,
-      "ratio": 2469.305
+      "pop": 1711000,
+      "ratio": 2.699
     },
     {
       "code": "25",
       "name": "滋賀県",
       "foreign": 26584,
-      "pop": 1405,
-      "ratio": 1892.1
+      "pop": 1402000,
+      "ratio": 1.896
     },
     {
       "code": "26",
       "name": "京都府",
       "foreign": 55647,
-      "pop": 2622,
-      "ratio": 2122.311
+      "pop": 2520000,
+      "ratio": 2.208
     },
     {
       "code": "27",
       "name": "大阪府",
       "foreign": 223025,
-      "pop": 8801,
-      "ratio": 2534.087
+      "pop": 8757000,
+      "ratio": 2.547
     },
     {
       "code": "28",
       "name": "兵庫県",
       "foreign": 103505,
-      "pop": 5583,
-      "ratio": 1853.932
+      "pop": 5337000,
+      "ratio": 1.939
     },
     {
       "code": "29",
       "name": "奈良県",
       "foreign": 11528,
-      "pop": 1399,
-      "ratio": 824.017
+      "pop": 1285000,
+      "ratio": 0.897
     },
     {
       "code": "30",
       "name": "和歌山県",
       "foreign": 6365,
-      "pop": 1004,
-      "ratio": 633.964
+      "pop": 880000,
+      "ratio": 0.723
     },
     {
       "code": "31",
       "name": "鳥取県",
       "foreign": 4152,
-      "pop": 591,
-      "ratio": 702.538
+      "pop": 531000,
+      "ratio": 0.782
     },
     {
       "code": "32",
       "name": "島根県",
       "foreign": 7414,
-      "pop": 718,
-      "ratio": 1032.591
+      "pop": 642000,
+      "ratio": 1.155
     },
     {
       "code": "33",
       "name": "岡山県",
       "foreign": 24588,
-      "pop": 1942,
-      "ratio": 1266.117
+      "pop": 1831000,
+      "ratio": 1.343
     },
     {
       "code": "34",
       "name": "広島県",
       "foreign": 47663,
-      "pop": 2863,
-      "ratio": 1664.792
+      "pop": 2714000,
+      "ratio": 1.756
     },
     {
       "code": "35",
       "name": "山口県",
       "foreign": 14953,
-      "pop": 1455,
-      "ratio": 1027.698
+      "pop": 1281000,
+      "ratio": 1.167
     },
     {
       "code": "36",
       "name": "徳島県",
       "foreign": 5500,
-      "pop": 789,
-      "ratio": 697.085
+      "pop": 685000,
+      "ratio": 0.803
     },
     {
       "code": "37",
       "name": "香川県",
       "foreign": 11290,
-      "pop": 999,
-      "ratio": 1130.13
+      "pop": 917000,
+      "ratio": 1.231
     },
     {
       "code": "38",
       "name": "愛媛県",
       "foreign": 11122,
-      "pop": 1436,
-      "ratio": 774.513
+      "pop": 1276000,
+      "ratio": 0.872
     },
     {
       "code": "39",
       "name": "高知県",
       "foreign": 4127,
-      "pop": 766,
-      "ratio": 538.773
+      "pop": 656000,
+      "ratio": 0.629
     },
     {
       "code": "40",
       "name": "福岡県",
       "foreign": 68573,
-      "pop": 5053,
-      "ratio": 1357.075
+      "pop": 5092000,
+      "ratio": 1.347
     },
     {
       "code": "41",
       "name": "佐賀県",
       "foreign": 5516,
-      "pop": 852,
-      "ratio": 647.418
+      "pop": 788000,
+      "ratio": 0.7
     },
     {
       "code": "42",
       "name": "長崎県",
       "foreign": 11198,
-      "pop": 1430,
-      "ratio": 783.077
+      "pop": 1252000,
+      "ratio": 0.894
     },
     {
       "code": "43",
       "name": "熊本県",
       "foreign": 12453,
-      "pop": 1814,
-      "ratio": 686.494
+      "pop": 1697000,
+      "ratio": 0.734
     },
     {
       "code": "44",
       "name": "大分県",
       "foreign": 11362,
-      "pop": 1195,
-      "ratio": 950.795
+      "pop": 1085000,
+      "ratio": 1.047
     },
     {
       "code": "45",
       "name": "宮崎県",
       "foreign": 5367,
-      "pop": 1132,
-      "ratio": 474.117
+      "pop": 1033000,
+      "ratio": 0.52
     },
     {
       "code": "46",
       "name": "鹿児島県",
       "foreign": 8364,
-      "pop": 1708,
-      "ratio": 489.696
+      "pop": 1532000,
+      "ratio": 0.546
     },
     {
       "code": "47",
       "name": "沖縄県",
       "foreign": 14599,
-      "pop": 1382,
-      "ratio": 1056.368
+      "pop": 1466000,
+      "ratio": 0.996
     }
   ]
 }
