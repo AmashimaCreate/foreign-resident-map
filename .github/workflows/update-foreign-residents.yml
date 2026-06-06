@@ -5,10 +5,23 @@ name: Update foreign residents data
 on:
   schedule:
     - cron: "0 0 1 * *"   # 毎月1日 00:00 UTC
-  workflow_dispatch: {}     # 手動実行も可能
+  workflow_dispatch:
+    inputs:
+      zairyu_stats_id:
+        description: "在留外国人 statsDataId（空ならコード既定値 0003147229 を使用）"
+        required: false
+        default: ""
+      pop_stats_id:
+        description: "人口推計 statsDataId（空ならコード既定値 0004010044 を使用）"
+        required: false
+        default: ""
 
 permissions:
   contents: write
+
+concurrency:
+  group: update-foreign-residents
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -20,10 +33,22 @@ jobs:
         with:
           python-version: "3.12"
 
+      # 依存なし（urllib/json の標準ライブラリのみ）。appId はコード直書きせず Secrets から。
       - name: Generate data from e-Stat API
         env:
           ESTAT_APP_ID: ${{ secrets.ESTAT_APP_ID }}
+          ZAIRYU_STATS_ID: ${{ github.event.inputs.zairyu_stats_id }}
+          POP_STATS_ID: ${{ github.event.inputs.pop_stats_id }}
         run: python build_data.py
+
+      # 生成物を成果物として保存（コミット有無に関わらず中身を確認できるように）
+      - name: Upload JSON artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: foreign_residents_json
+          path: data/foreign_residents.json
+          if-no-files-found: ignore
 
       - name: Commit if changed
         run: |
