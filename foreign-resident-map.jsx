@@ -54,6 +54,24 @@ function useIsNarrow(bp=760){
   return narrow;
 }
 
+// 詳細パネルへ「ぬるっと」スクロール（native smoothが無効な環境でも動くよう自前アニメ）
+function smoothScrollToY(targetY, duration=480){
+  try{
+    const startY = window.scrollY || document.documentElement.scrollTop || 0;
+    const dist = targetY - startY;
+    if(Math.abs(dist) < 4) return;
+    let start = null;
+    const ease = (t)=> t<0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; // easeInOutCubic
+    const step = (ts)=>{
+      if(start===null) start=ts;
+      const p = Math.min((ts-start)/duration, 1);
+      window.scrollTo(0, Math.round(startY + dist*ease(p)));
+      if(p<1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }catch(e){}
+}
+
 export default function App(){
   const [sel,setSel]=useState(DATA.prefs.find(p=>p.name==="東京都"));
   const [metric,setMetric]=useState("ratio"); // ratio | count | growth
@@ -61,9 +79,12 @@ export default function App(){
   const narrow=useIsNarrow(); // スマホ幅判定（レイアウトのみ）
   const [mapStyle,setMapStyle]=useState("real"); // real(リアル地図SVG) | tile(タイル地図)
   const detailRef=useRef(null);
-  const selectPref=(p)=>{ // 県を選択→スマホ(縦積み)では詳細パネルへ自動スクロール
+  const selectPref=(p)=>{ // 県を選択→スマホ(縦積み)では詳細パネルへ"ぬるっと"スクロール
     setSel(p);
-    if(narrow && detailRef.current) detailRef.current.scrollIntoView({behavior:"instant", block:"start"});
+    if(narrow && detailRef.current){
+      const y = detailRef.current.getBoundingClientRect().top + (window.scrollY||0) - 8;
+      smoothScrollToY(y, 480);
+    }
   };
 
   const maxRatio=useMemo(()=>Math.max(...DATA.prefs.map(ratio)),[]);
@@ -99,6 +120,8 @@ export default function App(){
     <div style={{fontFamily:"'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif",
       background:"#f4f1ea", minHeight:"100vh", padding:"20px 16px", color:"#1a1a1a"}}>
       <div style={{maxWidth:1100, margin:"0 auto"}}>
+        {/* recharts要素のクリック時フォーカス枠（円グラフの謎の枠）を消す */}
+        <style>{`.recharts-sector:focus,.recharts-surface:focus,.recharts-wrapper svg:focus,.recharts-layer:focus,.recharts-pie:focus{outline:none}`}</style>
 
         <div style={{borderLeft:"5px solid #7f0000", paddingLeft:14, marginBottom:14}}>
           <h1 style={{margin:0, fontSize:28, letterSpacing:1}}>外国人比率マップ</h1>
@@ -110,26 +133,27 @@ export default function App(){
         <div style={{display:"grid", gridTemplateColumns: narrow?"1fr":"1.3fr 1fr", gap:18, alignItems:"start"}}>
           {/* MAP */}
           <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
-            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10, flexWrap:"wrap", gap:6}}>
+            {/* 見出し＋「地図の見た目」切替（リアル/タイル）を同じ行に */}
+            <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8, flexWrap:"wrap", gap:6}}>
               <h2 style={{margin:0, fontSize:17}}>地図</h2>
-              <div style={{display:"flex", gap:8, flexWrap:"wrap"}}>
-                <div style={{display:"flex", gap:4}}>
-                  {[["real","リアル"],["tile","タイル"]].map(([k,l])=>(
-                    <button key={k} onClick={()=>setMapStyle(k)}
-                      style={{fontSize:13, padding:"4px 10px", borderRadius:14, cursor:"pointer",
-                        border:"1px solid #7f0000", background:mapStyle===k?"#7f0000":"#fff",
-                        color:mapStyle===k?"#fff":"#7f0000"}}>{l}</button>
-                  ))}
-                </div>
-                <div style={{display:"flex", gap:4}}>
-                  {[["ratio","比率%"],["count","人数"],["growth","増減率"]].map(([k,l])=>(
-                    <button key={k} onClick={()=>setMetric(k)}
-                      style={{fontSize:13, padding:"4px 10px", borderRadius:14, cursor:"pointer",
-                        border:"1px solid #7f0000", background:metric===k?"#7f0000":"#fff",
-                        color:metric===k?"#fff":"#7f0000"}}>{l}</button>
-                  ))}
-                </div>
+              <div style={{display:"flex", gap:4}}>
+                {[["real","リアル"],["tile","タイル"]].map(([k,l])=>(
+                  <button key={k} onClick={()=>setMapStyle(k)}
+                    style={{fontSize:13, padding:"4px 10px", borderRadius:14, cursor:"pointer",
+                      border:"1px solid #7f0000", background:mapStyle===k?"#7f0000":"#fff",
+                      color:mapStyle===k?"#fff":"#7f0000"}}>{l}</button>
+                ))}
               </div>
+            </div>
+            {/* 「指標」切替（比率/人数/増減）は属性が違うので1段下に分離 */}
+            <div style={{display:"flex", alignItems:"center", gap:6, marginBottom:10, flexWrap:"wrap"}}>
+              <span style={{fontSize:11, color:"#999"}}>指標</span>
+              {[["ratio","比率%"],["count","人数"],["growth","増減率"]].map(([k,l])=>(
+                <button key={k} onClick={()=>setMetric(k)}
+                  style={{fontSize:13, padding:"4px 10px", borderRadius:14, cursor:"pointer",
+                    border:"1px solid #7f0000", background:metric===k?"#7f0000":"#fff",
+                    color:metric===k?"#fff":"#7f0000"}}>{l}</button>
+              ))}
             </div>
             {mapStyle==="real" ? (
               <JapanMap prefs={DATA.prefs} colorFor={cellColor} selectedCode={sel.code} onSelect={selectPref}
@@ -215,7 +239,7 @@ export default function App(){
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie data={DATA.nationality} dataKey="v" nameKey="name" cx="50%" cy="50%"
-                      outerRadius={narrow?70:74} labelLine={false}>
+                      outerRadius={narrow?70:74} labelLine={false} rootTabIndex={-1}>
                       {DATA.nationality.map((e,i)=><Cell key={i} fill={NAT_COLORS[i%NAT_COLORS.length]}/>)}
                     </Pie>
                     <Tooltip formatter={(v)=>yen(v)+"人"}/>
