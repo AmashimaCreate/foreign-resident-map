@@ -332,10 +332,14 @@ def discover():
     """getStatsList で在留外国人/人口推計の候補表を一覧表示し、正しい statsDataId を探す。"""
     if not APP_ID:
         sys.exit("ERROR: ESTAT_APP_ID 未設定。")
-    searches = [
-        ("在留外国人 (statsCode=%s 全件)" % ZAIRYU_STATS_CODE, {"statsCode": ZAIRYU_STATS_CODE}),
-        ("人口推計 (statsCode=%s 都道府県)" % POP_STATS_CODE, {"statsCode": POP_STATS_CODE, "searchWord": "都道府県"}),
-    ]
+    q = (os.environ.get("DISCOVER_QUERY") or "").strip()
+    if q:
+        searches = [("検索: %s" % q, {"searchWord": q})]
+    else:
+        searches = [
+            ("在留外国人 (statsCode=%s 全件)" % ZAIRYU_STATS_CODE, {"statsCode": ZAIRYU_STATS_CODE}),
+            ("人口推計 (statsCode=%s 都道府県)" % POP_STATS_CODE, {"statsCode": POP_STATS_CODE, "searchWord": "都道府県"}),
+        ]
     for label, extra in searches:
         params = {"appId": APP_ID, "lang": "J", "limit": "100"}
         params.update(extra)

@@ -19,6 +19,10 @@ on:
         description: "人口推計 statsDataId（空ならコード既定値を使用）"
         required: false
         default: ""
+      query:
+        description: "discover時の自由検索語（getStatsList searchWord）"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -43,6 +47,7 @@ jobs:
           ESTAT_APP_ID: ${{ secrets.ESTAT_APP_ID }}
           ZAIRYU_STATS_ID: ${{ github.event.inputs.zairyu_stats_id }}
           POP_STATS_ID: ${{ github.event.inputs.pop_stats_id }}
+          DISCOVER_QUERY: ${{ github.event.inputs.query }}
         run: |
           if [ "${{ github.event.inputs.discover }}" = "true" ]; then
             python build_data.py --discover
