@@ -45,9 +45,13 @@ BASE = os.environ.get("ESTAT_BASE", "https://api.e-stat.go.jp/rest/3.0/app/json/
 LIST_BASE = BASE.replace("getStatsData", "getStatsList")
 APP_ID = (os.environ.get("ESTAT_APP_ID") or "").strip()  # 貼り付け時の改行/空白を除去
 
-# 既定（実 statsDataId は --discover / APIボタンで確認し env で上書き推奨）
+# 既定 statsDataId（--discover で確認済み）
+#   POP   : 0003448232「都道府県，男女別人口－総人口」最新2024年・単位千人（検証済み＝jsxの人口と一致）
+#   ZAIRYU: 0003147229「都道府県別 国籍・地域別 在留外国人」は API DB だと 2012-2017 のみ。
+#           現行（2018+）の都道府県別在留外国人は e-Stat API DB に未整備（国籍別の全国表のみ存在）。
+#           → 現行の都道府県別 statsDataId が判明したら env ZAIRYU_STATS_ID で指定する。
 ZAIRYU_STATS_ID = (os.environ.get("ZAIRYU_STATS_ID") or "").strip() or "0003147229"
-POP_STATS_ID = (os.environ.get("POP_STATS_ID") or "").strip() or "0004010044"
+POP_STATS_ID = (os.environ.get("POP_STATS_ID") or "").strip() or "0003448232"
 
 # 政府統計コード（getStatsList 絞り込み用）
 ZAIRYU_STATS_CODE = "00250012"   # 在留外国人統計（出入国在留管理庁）
