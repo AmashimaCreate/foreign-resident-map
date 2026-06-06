@@ -4,7 +4,7 @@
 都道府県データは `foreign-resident-map.jsx` に直書き（実データ・2025年6月末時点）。
 県をタップすると市区町村ドリルダウン（ミニ地図＋ランキング、市単位⇔区単位切替）を表示。
 
-**公開URL（GitHub Pages）**: https://amashimacreate.github.io/foreign-resident-map/
+**公開URL**: https://seiji-mieru.com （独自ドメイン・GitHub Pages ホスティング）
 
 ## 主な機能
 
@@ -51,8 +51,8 @@ npm run preview    # ビルド結果をローカル確認
 ビルド → `actions/deploy-pages` で自動公開します（手動操作は不要）。
 
 - Pages のソースは「GitHub Actions」（初回のみ API で有効化済み）
-- 公開URL: https://amashimacreate.github.io/foreign-resident-map/
-- 本番ビルドの `base` は `vite.config.js` で `/foreign-resident-map/` に設定
+- 公開URL: https://seiji-mieru.com （独自ドメイン。Cloudflare DNS→GitHub Pages、プロキシOFF）
+- `vite.config.js` の `base` は `/`（ルート公開）。`public/CNAME` に `seiji-mieru.com` を置きビルドで `dist/CNAME` へ出力
 
 ## データ更新（出典と運用方針）
 
