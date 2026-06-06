@@ -18,20 +18,22 @@ const GRID = {
 
 export default function TileMap({ prefs, colorFor, textFor, isDarkFor, titleFor, selectedCode, onSelect }) {
   return (
-    <div style={{display:"grid", gridTemplateColumns:"repeat(11,1fr)", gridTemplateRows:"repeat(13,1fr)", gap:3}}>
+    // aspectRatio で各行を等高にし、空セルも面積を持たせて地理形状を崩さない＝整然と見せる
+    <div style={{display:"grid", gridTemplateColumns:"repeat(11,1fr)", gridTemplateRows:"repeat(13,1fr)",
+      gap:4, aspectRatio:"11 / 13"}}>
       {prefs.map(p=>{
         const [r,c]=GRID[p.code]; const isSel=selectedCode===p.code;
         return (
           <div key={p.code} onClick={()=>onSelect(p)}
             title={titleFor?titleFor(p):undefined}
-            style={{gridRow:r+1, gridColumn:c+1, background:colorFor(p),
-              border:isSel?"2px solid #111":"1px solid rgba(0,0,0,.15)", borderRadius:4,
-              padding:"4px 2px", cursor:"pointer", minHeight:38, display:"flex",
-              flexDirection:"column", justifyContent:"center", alignItems:"center",
-              color:isDarkFor(p)?"#fff":"#333", transform:isSel?"scale(1.08)":"none",
-              boxShadow:isSel?"0 2px 8px rgba(0,0,0,.25)":"none", transition:"transform .1s"}}>
-            <span style={{fontSize:10, fontWeight:700, lineHeight:1}}>{p.name.replace(/[都府県]$/,"")}</span>
-            <span style={{fontSize:9, lineHeight:1.3}}>{textFor(p)}</span>
+            style={{gridRow:r+1, gridColumn:c+1, background:colorFor(p), borderRadius:5,
+              cursor:"pointer", overflow:"hidden", display:"flex", flexDirection:"column",
+              justifyContent:"center", alignItems:"center", color:isDarkFor(p)?"#fff":"#333",
+              border:isSel?"2px solid #111":"1px solid rgba(0,0,0,.10)",
+              position:"relative", zIndex:isSel?2:1,
+              boxShadow:isSel?"0 1px 6px rgba(0,0,0,.30)":"none", transition:"box-shadow .1s"}}>
+            <span style={{fontSize:10, fontWeight:700, lineHeight:1.05, textAlign:"center", whiteSpace:"nowrap"}}>{p.name.replace(/[都府県]$/,"")}</span>
+            <span style={{fontSize:9, lineHeight:1.2, opacity:.92}}>{textFor(p)}</span>
           </div>
         );
       })}

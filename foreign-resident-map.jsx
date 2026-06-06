@@ -94,6 +94,10 @@ export default function App(){
 
   const sortedByRatio=useMemo(()=>[...DATA.prefs].sort((a,b)=>ratio(b)-ratio(a)),[]);
   const sortedByGrowth=useMemo(()=>[...DATA.prefs].sort((a,b)=>growth(b)-growth(a)),[]);
+  const sortedByCount=useMemo(()=>[...DATA.prefs].sort((a,b)=>b.series[LATEST]-a.series[LATEST]),[]);
+  const totalForeign=DATA.national_trend[DATA.national_trend.length-1].total; // 全国計(25.6)＝推移グラフと一致
+  const ratioHi=sortedByRatio[0], ratioLo=sortedByRatio[sortedByRatio.length-1];
+  const countHi=sortedByCount[0], countLo=sortedByCount[sortedByCount.length-1];
 
   const cellColor=(p)=>{
     if(metric==="ratio") return colRatio(ratio(p),maxRatio);
@@ -130,6 +134,18 @@ export default function App(){
           </div>
         </div>
 
+        {/* 全国サマリー（2025年6月末） */}
+        <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)", marginBottom:18}}>
+          <h2 style={{margin:"0 0 10px", fontSize:17}}>全国サマリー　<span style={{fontSize:12, color:"#888"}}>2025年6月末</span></h2>
+          <div style={{display:"grid", gridTemplateColumns: narrow?"1fr 1fr":"1.4fr 1fr 1fr 1fr 1fr", gap:8}}>
+            <SummaryStat label="在留外国人 累計" value={yen(totalForeign)+"人"} accent/>
+            <SummaryStat label="比率 最高" name={ratioHi.name} value={ratio(ratioHi).toFixed(2)+"%"} onClick={()=>selectPref(ratioHi)}/>
+            <SummaryStat label="比率 最低" name={ratioLo.name} value={ratio(ratioLo).toFixed(2)+"%"} onClick={()=>selectPref(ratioLo)}/>
+            <SummaryStat label="人数 最多" name={countHi.name} value={yen(countHi.series[LATEST])+"人"} onClick={()=>selectPref(countHi)}/>
+            <SummaryStat label="人数 最少" name={countLo.name} value={yen(countLo.series[LATEST])+"人"} onClick={()=>selectPref(countLo)}/>
+          </div>
+        </div>
+
         <div style={{display:"grid", gridTemplateColumns: narrow?"1fr":"1.3fr 1fr", gap:18, alignItems:"start"}}>
           {/* MAP */}
           <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
@@ -151,8 +167,8 @@ export default function App(){
               {[["ratio","比率%"],["count","人数"],["growth","増減率"]].map(([k,l])=>(
                 <button key={k} onClick={()=>setMetric(k)}
                   style={{fontSize:13, padding:"4px 10px", borderRadius:14, cursor:"pointer",
-                    border:"1px solid #7f0000", background:metric===k?"#7f0000":"#fff",
-                    color:metric===k?"#fff":"#7f0000"}}>{l}</button>
+                    border:"1px solid #3f5366", background:metric===k?"#3f5366":"#fff",
+                    color:metric===k?"#fff":"#3f5366"}}>{l}</button>
               ))}
             </div>
             {mapStyle==="real" ? (
@@ -288,6 +304,18 @@ export default function App(){
       </div>
 
       {showMuni && <MunicipalityView pref={sel} onClose={()=>setShowMuni(false)} />}
+    </div>
+  );
+}
+
+function SummaryStat({label, name, value, accent, onClick}){
+  return (
+    <div onClick={onClick} title={onClick?`${name} を選択`:undefined}
+      style={{background:"#f4f1ea", borderRadius:8, padding:"8px 10px", textAlign:"center",
+        cursor:onClick?"pointer":"default", minWidth:0}}>
+      <div style={{fontSize:11, color:"#888"}}>{label}</div>
+      {name && <div style={{fontSize:13, fontWeight:700, marginTop:3, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}}>{name}</div>}
+      <div style={{fontSize:name?15:17, fontWeight:700, color:accent?"#7f0000":"#1a1a1a", marginTop:name?1:5}}>{value}</div>
     </div>
   );
 }
