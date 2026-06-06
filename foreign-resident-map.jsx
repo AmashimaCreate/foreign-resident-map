@@ -96,8 +96,8 @@ export default function App(){
       <div style={{maxWidth:1100, margin:"0 auto"}}>
 
         <div style={{borderLeft:"5px solid #7f0000", paddingLeft:14, marginBottom:14}}>
-          <h1 style={{margin:0, fontSize:26, letterSpacing:1}}>外国人比率マップ</h1>
-          <div style={{fontSize:12, color:"#666", marginTop:3}}>
+          <h1 style={{margin:0, fontSize:28, letterSpacing:1}}>外国人比率マップ</h1>
+          <div style={{fontSize:14, color:"#666", marginTop:3}}>
             都道府県別　在留外国人の比率・人数・増減　｜　2025年6月末時点（実データ）
           </div>
         </div>
@@ -106,12 +106,12 @@ export default function App(){
           {/* MAP */}
           <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
             <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10, flexWrap:"wrap", gap:6}}>
-              <h2 style={{margin:0, fontSize:15}}>地図（タップで選択）</h2>
+              <h2 style={{margin:0, fontSize:17}}>地図（タップで選択）</h2>
               <div style={{display:"flex", gap:8, flexWrap:"wrap"}}>
                 <div style={{display:"flex", gap:4}}>
                   {[["real","リアル"],["tile","タイル"]].map(([k,l])=>(
                     <button key={k} onClick={()=>setMapStyle(k)}
-                      style={{fontSize:11, padding:"4px 10px", borderRadius:14, cursor:"pointer",
+                      style={{fontSize:13, padding:"4px 10px", borderRadius:14, cursor:"pointer",
                         border:"1px solid #7f0000", background:mapStyle===k?"#7f0000":"#fff",
                         color:mapStyle===k?"#fff":"#7f0000"}}>{l}</button>
                   ))}
@@ -119,7 +119,7 @@ export default function App(){
                 <div style={{display:"flex", gap:4}}>
                   {[["ratio","比率%"],["count","人数"],["growth","増減率"]].map(([k,l])=>(
                     <button key={k} onClick={()=>setMetric(k)}
-                      style={{fontSize:11, padding:"4px 10px", borderRadius:14, cursor:"pointer",
+                      style={{fontSize:13, padding:"4px 10px", borderRadius:14, cursor:"pointer",
                         border:"1px solid #7f0000", background:metric===k?"#7f0000":"#fff",
                         color:metric===k?"#fff":"#7f0000"}}>{l}</button>
                   ))}
@@ -134,7 +134,7 @@ export default function App(){
                 selectedCode={sel.code} onSelect={setSel}
                 titleFor={(p)=>`${p.name} 比率${ratio(p).toFixed(2)}% / ${yen(p.series[LATEST])}人 / 増減+${growth(p).toFixed(0)}%`}/>
             )}
-            <div style={{marginTop:12, display:"flex", alignItems:"center", gap:8, fontSize:10, color:"#666"}}>
+            <div style={{marginTop:12, display:"flex", alignItems:"center", gap:8, fontSize:12, color:"#666"}}>
               <span>{metric==="growth"?"低":"低"}</span>
               <div style={{flex:1, height:10, borderRadius:5, background:
                 metric==="growth"?"linear-gradient(to right,#2178b4,#f5f5eb,#c82828)":"linear-gradient(to right,#fff7ec,#7f0000)"}}/>
@@ -149,7 +149,7 @@ export default function App(){
 
           {/* DETAIL */}
           <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
-            <h2 style={{margin:"0 0 8px", fontSize:15}}>{sel.name}　<span style={{fontSize:12,color:"#888"}}>詳細</span></h2>
+            <h2 style={{margin:"0 0 8px", fontSize:17}}>{sel.name}　<span style={{fontSize:14,color:"#888"}}>詳細</span></h2>
             <div style={{display:"flex", gap:8, marginBottom:6, flexWrap:"wrap"}}>
               <Stat label="在留外国人(25.6)" value={yen(sel.series[LATEST])} />
               <Stat label="比率" value={ratio(sel).toFixed(2)+"%"} accent />
@@ -161,15 +161,15 @@ export default function App(){
             </div>
             <button onClick={()=>setShowMuni(true)}
               style={{width:"100%", marginBottom:12, padding:"9px 12px", borderRadius:8, cursor:"pointer",
-                border:"1px solid #7f0000", background:"#7f0000", color:"#fff", fontSize:13, fontWeight:700}}>
+                border:"1px solid #7f0000", background:"#7f0000", color:"#fff", fontSize:15, fontWeight:700}}>
               🔍 {sel.name}の市区町村を見る
             </button>
-            <div style={{fontSize:11, color:"#666", marginBottom:2}}>在留外国人数の推移（実数・4時点）</div>
+            <div style={{fontSize:13, color:"#666", marginBottom:2}}>在留外国人数の推移（実数・4時点）</div>
             <ResponsiveContainer width="100%" height={150}>
               <BarChart data={selTrend} margin={{top:6,right:4,left:0,bottom:0}}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#eee"/>
-                <XAxis dataKey="year" tick={{fontSize:10}}/>
-                <YAxis tick={{fontSize:10}} width={46} tickFormatter={(v)=>v>=10000?(v/10000).toFixed(0)+"万":(v/1000).toFixed(0)+"k"}/>
+                <XAxis dataKey="year" tick={{fontSize:12}}/>
+                <YAxis tick={{fontSize:12}} width={46} tickFormatter={(v)=>v>=10000?(v/10000).toFixed(0)+"万":(v/1000).toFixed(0)+"k"}/>
                 <Tooltip formatter={(v)=>yen(v)+"人"}/>
                 <Bar dataKey="v" fill="#7f0000" radius={[3,3,0,0]}/>
               </BarChart>
@@ -190,21 +190,21 @@ export default function App(){
         {/* national trend + nationality */}
         <div style={{display:"grid", gridTemplateColumns: narrow?"1fr":"1fr 1fr", gap:18, marginTop:18}}>
           <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
-            <h2 style={{margin:"0 0 4px", fontSize:15}}>全国 在留外国人数の推移</h2>
-            <div style={{fontSize:10, color:"#999", marginBottom:4}}>各年末＋2025年6月末・実数（出入国在留管理庁）</div>
+            <h2 style={{margin:"0 0 4px", fontSize:17}}>全国 在留外国人数の推移</h2>
+            <div style={{fontSize:12, color:"#999", marginBottom:4}}>各年末＋2025年6月末・実数（出入国在留管理庁）</div>
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={DATA.national_trend} margin={{top:6,right:8,left:0,bottom:0}}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#eee"/>
-                <XAxis dataKey="year" tick={{fontSize:10}}/>
-                <YAxis tick={{fontSize:10}} width={42} tickFormatter={(v)=>(v/1000000).toFixed(1)+"M"}/>
+                <XAxis dataKey="year" tick={{fontSize:12}}/>
+                <YAxis tick={{fontSize:12}} width={42} tickFormatter={(v)=>(v/1000000).toFixed(1)+"M"}/>
                 <Tooltip formatter={(v)=>yen(v)+"人"}/>
                 <Line type="monotone" dataKey="total" stroke="#7f0000" strokeWidth={2.5} dot={{r:3}}/>
               </LineChart>
             </ResponsiveContainer>
           </div>
           <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
-            <h2 style={{margin:"0 0 4px", fontSize:15}}>国籍構成（全国 2025年6月末）</h2>
-            <div style={{fontSize:10, color:"#999", marginBottom:4}}>実数（出入国在留管理庁）</div>
+            <h2 style={{margin:"0 0 4px", fontSize:17}}>国籍構成（全国 2025年6月末）</h2>
+            <div style={{fontSize:12, color:"#999", marginBottom:4}}>実数（出入国在留管理庁）</div>
             <div style={{display:"flex", flexDirection: narrow?"column":"row", alignItems:"center", gap:10}}>
               <div style={{width: narrow?"100%":"50%", height:170}}>
                 <ResponsiveContainer width="100%" height="100%">
@@ -236,13 +236,13 @@ export default function App(){
 
         {/* naturalization */}
         <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)", marginTop:18}}>
-          <h2 style={{margin:"0 0 4px", fontSize:15}}>帰化許可者数の推移</h2>
-          <div style={{fontSize:10, color:"#999", marginBottom:4}}>暦年・全国（法務省）※都道府県別データは非公表のため全国のみ</div>
+          <h2 style={{margin:"0 0 4px", fontSize:17}}>帰化許可者数の推移</h2>
+          <div style={{fontSize:12, color:"#999", marginBottom:4}}>暦年・全国（法務省）※都道府県別データは非公表のため全国のみ</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={DATA.naturalization} margin={{top:6,right:8,left:0,bottom:0}}>
               <CartesianGrid strokeDasharray="3 3" stroke="#eee"/>
-              <XAxis dataKey="year" tick={{fontSize:10}}/>
-              <YAxis tick={{fontSize:10}} width={48}/>
+              <XAxis dataKey="year" tick={{fontSize:12}}/>
+              <YAxis tick={{fontSize:12}} width={48}/>
               <Tooltip formatter={(v)=>yen(v)+"人"}/>
               <Bar dataKey="n" fill="#2980b9" radius={[3,3,0,0]}/>
             </BarChart>
@@ -267,8 +267,8 @@ function Stat({label,value,accent,small}){
   return (
     <div style={{flex:small?"1 1 45%":1, background:accent?"#7f0000":"#f4f1ea",
       color:accent?"#fff":"#333", borderRadius:8, padding:"7px 6px", textAlign:"center", minWidth:70}}>
-      <div style={{fontSize:9, opacity:.8}}>{label}</div>
-      <div style={{fontSize:small?13:15, fontWeight:700, marginTop:2}}>{value}</div>
+      <div style={{fontSize:11, opacity:.8}}>{label}</div>
+      <div style={{fontSize:small?15:17, fontWeight:700, marginTop:2}}>{value}</div>
     </div>
   );
 }
@@ -276,17 +276,17 @@ function Stat({label,value,accent,small}){
 function RankCard({title,rows,value,frac,color,onSel,sel}){
   return (
     <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
-      <h2 style={{margin:"0 0 10px", fontSize:14}}>{title}</h2>
+      <h2 style={{margin:"0 0 10px", fontSize:16}}>{title}</h2>
       {rows.map((p,i)=>(
         <div key={p.code} onClick={()=>onSel(p)}
           style={{display:"flex", alignItems:"center", gap:8, padding:"3px 0", cursor:"pointer",
             background:sel.code===p.code?"#faf3f3":"transparent", borderRadius:4}}>
-          <span style={{width:20, fontSize:11, color:"#999", textAlign:"right"}}>{i+1}</span>
-          <span style={{width:52, fontSize:12, fontWeight:600}}>{p.name}</span>
+          <span style={{width:20, fontSize:13, color:"#999", textAlign:"right"}}>{i+1}</span>
+          <span style={{width:52, fontSize:14, fontWeight:600}}>{p.name}</span>
           <div style={{flex:1, background:"#f0ece2", borderRadius:4, height:14}}>
             <div style={{width:`${Math.max(frac(p)*100,2)}%`, background:color(p), height:"100%", borderRadius:4}}/>
           </div>
-          <span style={{width:54, fontSize:11, textAlign:"right"}}>{value(p)}</span>
+          <span style={{width:54, fontSize:13, textAlign:"right"}}>{value(p)}</span>
         </div>
       ))}
     </div>
