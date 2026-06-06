@@ -1,0 +1,38 @@
+name: Update foreign residents data
+
+# 在留外国人統計は年2回（6月末・12月末、公表は約半年後）更新される。
+# 取りこぼし防止のため月1で実行し、差分がある時だけコミットする。
+on:
+  schedule:
+    - cron: "0 0 1 * *"   # 毎月1日 00:00 UTC
+  workflow_dispatch: {}     # 手動実行も可能
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate data from e-Stat API
+        env:
+          ESTAT_APP_ID: ${{ secrets.ESTAT_APP_ID }}
+        run: python build_data.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/foreign_residents.json
+          if git diff --staged --quiet; then
+            echo "No changes."
+          else
+            git commit -m "chore: update foreign residents data ($(date +%Y-%m-%d))"
+            git push
+          fi

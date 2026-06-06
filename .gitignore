@@ -1,0 +1,25 @@
+# Node
+node_modules/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Env / local
+.env
+.env.local
+*.local
+
+# Claude Code (personal settings; keep launch.json shared)
+.claude/settings.local.json
+
+# OS
+.DS_Store
+
+# 生データ（本番では e-Stat API 取得へ移行するためコミットしない）
+人口/
+
+# Python
+__pycache__/
+*.pyc
