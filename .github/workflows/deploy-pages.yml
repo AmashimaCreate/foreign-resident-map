@@ -32,9 +32,9 @@ jobs:
 
       - run: npm run build
 
+      # Pages はリポジトリ設定で「GitHub Actions」をソースに有効化済み
+      # （初回のみ API で設定: POST /repos/{owner}/{repo}/pages build_type=workflow）
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true   # 初回実行時に Pages を自動で有効化（手動設定不要）
 
       - uses: actions/upload-pages-artifact@v3
         with:
