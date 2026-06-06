@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import MunicipalityView from "./MunicipalityView.jsx";
 import JapanMap from "./JapanMap.jsx";
@@ -60,6 +60,11 @@ export default function App(){
   const [showMuni,setShowMuni]=useState(false); // 市区町村ドリルダウン（別データ・別コンポーネント）
   const narrow=useIsNarrow(); // スマホ幅判定（レイアウトのみ）
   const [mapStyle,setMapStyle]=useState("real"); // real(リアル地図SVG) | tile(タイル地図)
+  const detailRef=useRef(null);
+  const selectPref=(p)=>{ // 県を選択→スマホ(縦積み)では詳細パネルへ自動スクロール
+    setSel(p);
+    if(narrow && detailRef.current) detailRef.current.scrollIntoView({behavior:"instant", block:"start"});
+  };
 
   const maxRatio=useMemo(()=>Math.max(...DATA.prefs.map(ratio)),[]);
   const maxCount=useMemo(()=>Math.max(...DATA.prefs.map(p=>p.series[LATEST])),[]);
@@ -106,7 +111,7 @@ export default function App(){
           {/* MAP */}
           <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
             <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10, flexWrap:"wrap", gap:6}}>
-              <h2 style={{margin:0, fontSize:17}}>地図（タップで選択）</h2>
+              <h2 style={{margin:0, fontSize:17}}>地図</h2>
               <div style={{display:"flex", gap:8, flexWrap:"wrap"}}>
                 <div style={{display:"flex", gap:4}}>
                   {[["real","リアル"],["tile","タイル"]].map(([k,l])=>(
@@ -127,11 +132,11 @@ export default function App(){
               </div>
             </div>
             {mapStyle==="real" ? (
-              <JapanMap prefs={DATA.prefs} colorFor={cellColor} selectedCode={sel.code} onSelect={setSel}
+              <JapanMap prefs={DATA.prefs} colorFor={cellColor} selectedCode={sel.code} onSelect={selectPref}
                 titleFor={(p)=>`${p.name}　比率${ratio(p).toFixed(2)}% / ${yen(p.series[LATEST])}人 / 増減+${growth(p).toFixed(0)}%`}/>
             ) : (
               <TileMap prefs={DATA.prefs} colorFor={cellColor} textFor={cellText} isDarkFor={isDark}
-                selectedCode={sel.code} onSelect={setSel}
+                selectedCode={sel.code} onSelect={selectPref}
                 titleFor={(p)=>`${p.name} 比率${ratio(p).toFixed(2)}% / ${yen(p.series[LATEST])}人 / 増減+${growth(p).toFixed(0)}%`}/>
             )}
             <div style={{marginTop:12, display:"flex", alignItems:"center", gap:8, fontSize:12, color:"#666"}}>
@@ -148,7 +153,7 @@ export default function App(){
           </div>
 
           {/* DETAIL */}
-          <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
+          <div ref={detailRef} style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
             <h2 style={{margin:"0 0 8px", fontSize:17}}>{sel.name}　<span style={{fontSize:14,color:"#888"}}>詳細</span></h2>
             <div style={{display:"flex", gap:8, marginBottom:6, flexWrap:"wrap"}}>
               <Stat label="在留外国人(25.6)" value={yen(sel.series[LATEST])} />
