@@ -333,7 +333,7 @@ def discover():
     if not APP_ID:
         sys.exit("ERROR: ESTAT_APP_ID 未設定。")
     searches = [
-        ("在留外国人 (statsCode=%s 国籍)" % ZAIRYU_STATS_CODE, {"statsCode": ZAIRYU_STATS_CODE, "searchWord": "国籍"}),
+        ("在留外国人 (statsCode=%s 全件)" % ZAIRYU_STATS_CODE, {"statsCode": ZAIRYU_STATS_CODE}),
         ("人口推計 (statsCode=%s 都道府県)" % POP_STATS_CODE, {"statsCode": POP_STATS_CODE, "searchWord": "都道府県"}),
     ]
     for label, extra in searches:
@@ -355,6 +355,40 @@ def discover():
             n = t.get("OVERALL_TOTAL_NUMBER")
             title = gx(t.get("TITLE"))
             print(f"  id={tid}  open={opened}  survey={survey}  n={n} | {title}")
+
+    # 設定中IDの中身（時点レンジ・単位・area数）を確認
+    print("\n### メタ確認（設定中の statsDataId）")
+    for sid in [ZAIRYU_STATS_ID, POP_STATS_ID]:
+        probe_meta(sid)
+
+
+def probe_meta(stats_id):
+    params = {"appId": APP_ID, "statsDataId": stats_id, "lang": "J",
+              "metaGetFlg": "Y", "cntGetFlg": "N", "limit": "1"}
+    data = http_get_json(BASE + "?" + urllib.parse.urlencode(params))
+    root = data.get("GET_STATS_DATA", {})
+    st = root.get("RESULT", {}).get("STATUS")
+    if st != 0:
+        print(f"  [{stats_id}] status={st} {root.get('RESULT', {}).get('ERROR_MSG', '')}")
+        return
+    cobjs = as_list(root["STATISTICAL_DATA"]["CLASS_INF"]["CLASS_OBJ"])
+    ntime = narea = 0
+    trange = None
+    units = set()
+    for c in cobjs:
+        cid = c.get("@id")
+        members = as_list(c.get("CLASS"))
+        if cid == "time":
+            ntime = len(members)
+            nm = [m.get("@name") for m in members]
+            trange = (nm[:2], nm[-2:])
+        elif cid == "area":
+            narea = len(members)
+        else:
+            for m in members:
+                if m.get("@unit"):
+                    units.add(m.get("@unit"))
+    print(f"  [{stats_id}] time:{ntime}件 範囲={trange}  area:{narea}  単位={units or '(なし)'}")
 
 
 # --------------------------------------------------------------------------
