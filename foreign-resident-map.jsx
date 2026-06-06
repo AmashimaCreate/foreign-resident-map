@@ -102,7 +102,7 @@ export default function App(){
       if(!units.length) return;
       const byR=[...units].sort((a,b)=>b.ratio-a.ratio);
       const byC=[...units].sort((a,b)=>b.foreign-a.foreign);
-      setMuniSummary({ratioHi:byR[0], ratioLo:byR[byR.length-1], countHi:byC[0], countLo:byC[byC.length-1]});
+      setMuniSummary({ratioHi:byR[0], ratioLo:byR[byR.length-1], countHi:byC[0], countLo:byC[byC.length-1], ranking:byR.slice(0,30)});
     }).catch(()=>{});
     return ()=>{alive=false;};
   },[]);
@@ -139,6 +139,20 @@ export default function App(){
   const selTrend=TIMES.map(t=>({year:TLABEL[t], v:sel.series[t]}));
   const selRatioRank=sortedByRatio.findIndex(p=>p.code===sel.code)+1;
   const selGrowth=growth(sel);
+
+  // 市区町村 比率ランキング（全国・区を含む）の1行。タップでその県のドリルダウンを開く。
+  const muniMaxRatio=(muniSummary&&muniSummary.ranking&&muniSummary.ranking[0])?muniSummary.ranking[0].ratio:1;
+  const muniRow=(u,idx)=>(
+    <div key={u.pref+u.name+idx} onClick={()=>{const p=DATA.prefs.find(x=>x.name===u.pref); if(p){setSel(p); setShowMuni(true);}}}
+      style={{display:"flex", alignItems:"center", gap:8, padding:"3px 2px", cursor:"pointer", borderRadius:4}}>
+      <span style={{width:24, fontSize:11, color:"#999", textAlign:"right"}}>{idx+1}</span>
+      <span style={{flex:"0 0 132px", fontSize:12, fontWeight:600, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap"}}>{u.pref.replace(/[都府県]$/,"")} {u.name}</span>
+      <div style={{flex:1, background:"#f0ece2", borderRadius:4, height:13, minWidth:30}}>
+        <div style={{width:`${Math.max(u.ratio/muniMaxRatio*100,2)}%`, background:colRatio(u.ratio,muniMaxRatio), height:"100%", borderRadius:4}}/>
+      </div>
+      <span style={{flex:"0 0 58px", fontSize:11, textAlign:"right"}}>{u.ratio.toFixed(2)+"%"}</span>
+    </div>
+  );
 
   return (
     <div style={{fontFamily:"'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif",
@@ -278,6 +292,22 @@ export default function App(){
             value={(p)=>"+"+growth(p).toFixed(1)+"%"} frac={(p)=>(growth(p)-gMin)/(gMax-gMin)}
             color={(p)=>colGrowth(growth(p),gMin,gMax)} onSel={setSel} sel={sel}/>
         </div>
+
+        {/* 市区町村 比率ランキング（全国・区を含む） */}
+        {muniSummary && muniSummary.ranking && (
+          <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)", marginTop:18}}>
+            <h2 style={{margin:"0 0 4px", fontSize:17}}>市区町村 比率ランキング</h2>
+            <div style={{fontSize:12, color:"#999", marginBottom:10}}>全国 TOP30・2025年6月末（政令市・特別区は区に展開／タップでその県のドリルダウン）</div>
+            {narrow ? (
+              <div>{muniSummary.ranking.map((u,i)=>muniRow(u,i))}</div>
+            ) : (
+              <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0 24px"}}>
+                <div>{muniSummary.ranking.slice(0,15).map((u,i)=>muniRow(u,i))}</div>
+                <div>{muniSummary.ranking.slice(15,30).map((u,i)=>muniRow(u,i+15))}</div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* national trend + nationality */}
         <div style={{display:"grid", gridTemplateColumns: narrow?"1fr":"1fr 1fr", gap:18, marginTop:18}}>
