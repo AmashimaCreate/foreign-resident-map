@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import MunicipalityView from "./MunicipalityView.jsx";
 import JapanMap from "./JapanMap.jsx";
+import TileMap from "./TileMap.jsx";
 
 /* =========================================================================
    外国人比率マップ（実データ版）
@@ -58,6 +59,7 @@ export default function App(){
   const [metric,setMetric]=useState("ratio"); // ratio | count | growth
   const [showMuni,setShowMuni]=useState(false); // 市区町村ドリルダウン（別データ・別コンポーネント）
   const narrow=useIsNarrow(); // スマホ幅判定（レイアウトのみ）
+  const [mapStyle,setMapStyle]=useState("real"); // real(リアル地図SVG) | tile(タイル地図)
 
   const maxRatio=useMemo(()=>Math.max(...DATA.prefs.map(ratio)),[]);
   const maxCount=useMemo(()=>Math.max(...DATA.prefs.map(p=>p.series[LATEST])),[]);
@@ -72,7 +74,17 @@ export default function App(){
     if(metric==="count") return colRatio(p.series[LATEST],maxCount);
     return colGrowth(growth(p),gMin,gMax);
   };
-  // cellText / isDark は旧グリッド用のため廃止（地図SVGは色のみで表現）
+  // タイル地図のセル文字・濃淡（リアル/タイル切替のため復活。描画のみ）
+  const cellText=(p)=>{
+    if(metric==="ratio") return ratio(p).toFixed(2)+"%";
+    if(metric==="count") return (p.series[LATEST]/1000).toFixed(0)+"k";
+    return "+"+growth(p).toFixed(0)+"%";
+  };
+  const isDark=(p)=>{
+    if(metric==="ratio") return ratio(p)>maxRatio*0.55;
+    if(metric==="count") return p.series[LATEST]>maxCount*0.55;
+    return growth(p)>gMin+(gMax-gMin)*0.7 || growth(p)<gMin+(gMax-gMin)*0.25;
+  };
 
   const selTrend=TIMES.map(t=>({year:TLABEL[t], v:sel.series[t]}));
   const selRatioRank=sortedByRatio.findIndex(p=>p.code===sel.code)+1;
@@ -95,17 +107,33 @@ export default function App(){
           <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)"}}>
             <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10, flexWrap:"wrap", gap:6}}>
               <h2 style={{margin:0, fontSize:15}}>地図（タップで選択）</h2>
-              <div style={{display:"flex", gap:4}}>
-                {[["ratio","比率%"],["count","人数"],["growth","増減率"]].map(([k,l])=>(
-                  <button key={k} onClick={()=>setMetric(k)}
-                    style={{fontSize:11, padding:"4px 10px", borderRadius:14, cursor:"pointer",
-                      border:"1px solid #7f0000", background:metric===k?"#7f0000":"#fff",
-                      color:metric===k?"#fff":"#7f0000"}}>{l}</button>
-                ))}
+              <div style={{display:"flex", gap:8, flexWrap:"wrap"}}>
+                <div style={{display:"flex", gap:4}}>
+                  {[["real","リアル"],["tile","タイル"]].map(([k,l])=>(
+                    <button key={k} onClick={()=>setMapStyle(k)}
+                      style={{fontSize:11, padding:"4px 10px", borderRadius:14, cursor:"pointer",
+                        border:"1px solid #7f0000", background:mapStyle===k?"#7f0000":"#fff",
+                        color:mapStyle===k?"#fff":"#7f0000"}}>{l}</button>
+                  ))}
+                </div>
+                <div style={{display:"flex", gap:4}}>
+                  {[["ratio","比率%"],["count","人数"],["growth","増減率"]].map(([k,l])=>(
+                    <button key={k} onClick={()=>setMetric(k)}
+                      style={{fontSize:11, padding:"4px 10px", borderRadius:14, cursor:"pointer",
+                        border:"1px solid #7f0000", background:metric===k?"#7f0000":"#fff",
+                        color:metric===k?"#fff":"#7f0000"}}>{l}</button>
+                  ))}
+                </div>
               </div>
             </div>
-            <JapanMap prefs={DATA.prefs} colorFor={cellColor} selectedCode={sel.code} onSelect={setSel}
-              titleFor={(p)=>`${p.name}　比率${ratio(p).toFixed(2)}% / ${yen(p.series[LATEST])}人 / 増減+${growth(p).toFixed(0)}%`}/>
+            {mapStyle==="real" ? (
+              <JapanMap prefs={DATA.prefs} colorFor={cellColor} selectedCode={sel.code} onSelect={setSel}
+                titleFor={(p)=>`${p.name}　比率${ratio(p).toFixed(2)}% / ${yen(p.series[LATEST])}人 / 増減+${growth(p).toFixed(0)}%`}/>
+            ) : (
+              <TileMap prefs={DATA.prefs} colorFor={cellColor} textFor={cellText} isDarkFor={isDark}
+                selectedCode={sel.code} onSelect={setSel}
+                titleFor={(p)=>`${p.name} 比率${ratio(p).toFixed(2)}% / ${yen(p.series[LATEST])}人 / 増減+${growth(p).toFixed(0)}%`}/>
+            )}
             <div style={{marginTop:12, display:"flex", alignItems:"center", gap:8, fontSize:10, color:"#666"}}>
               <span>{metric==="growth"?"低":"低"}</span>
               <div style={{flex:1, height:10, borderRadius:5, background:
