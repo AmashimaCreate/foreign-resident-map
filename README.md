@@ -32,9 +32,10 @@ npm run dev
 ├── foreign-resident-map.jsx … メインコンポーネント（データ直書き・recharts 使用）
 ├── vite.config.js          … Vite 設定（React プラグインのみ）
 ├── package.json
-├── build_data.py           … e-Stat API データ生成（今は未使用）
+├── build_data.py           … e-Stat API で都道府県別 総人口を取得 → data/population.json
 └── .github/workflows/
-    └── update-foreign-residents.yml … 月次データ更新ワークフロー（今は未使用）
+    ├── deploy-pages.yml             … main push で Pages へ自動デプロイ
+    └── update-foreign-residents.yml … 月次で総人口を自動更新（手動実行も可）
 ```
 
 ## ビルド
@@ -52,3 +53,25 @@ npm run preview    # ビルド結果をローカル確認
 - Pages のソースは「GitHub Actions」（初回のみ API で有効化済み）
 - 公開URL: https://amashimacreate.github.io/foreign-resident-map/
 - 本番ビルドの `base` は `vite.config.js` で `/foreign-resident-map/` に設定
+
+## データ更新（出典と運用方針）
+
+| データ | 出典 | 更新方法 |
+|---|---|---|
+| **総人口（都道府県）** | 総務省 人口推計（e-Stat API） | **自動**（`build_data.py` → `data/population.json`、月次ワークフロー） |
+| 在留外国人（都道府県） | 出入国在留管理庁 在留外国人統計 | **手動**（Excel から取得し `foreign-resident-map.jsx` を更新） |
+| 在留外国人・人口（市区町村） | 在留外国人統計 / 住民基本台帳 | **手動**（Excel から取得し `municipalities.json` を更新） |
+
+**なぜ在留外国人は手動か**：e-Stat の API データベース表では、**都道府県別・市区町村別の「在留外国人」は2017年までしか整備されていない**
+（現行は全国の国籍別表のみ DB 化）。そのため在留外国人は半年に1回、e-Stat の Excel から手動更新する。
+総人口は都道府県別の最新年（現在2024年）が API DB にあるため自動化している。
+
+### 総人口の自動更新
+
+- 事前準備：e-Stat の appId を発行し、リポジトリ Secrets に `ESTAT_APP_ID` で登録（コード直書き禁止）
+- 実行：Actions の「Update foreign residents data」を `Run workflow`（月次でも自動実行）
+- 使用表：`statsDataId=0003448232`（都道府県，男女別人口－総人口、単位 千人 → 人に換算）
+- 正しい statsDataId を探す補助：`Run workflow` の `discover=true`（`getStatsList` で候補と時点・単位を一覧）
+
+> ⚠️ `statdisp_id`（画面表示ID）と API の `statsDataId` は異なることがある。`discover` か各表の「API」ボタンで確認し、
+> 必要なら入力 `pop_stats_id` / `zairyu_stats_id` で上書きする。

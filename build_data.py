@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 """
-外国人比率マップ用データ生成スクリプト（都道府県レベル・自動更新）
+外国人比率マップ用データ生成スクリプト（都道府県別 総人口・自動更新）
 
-e-Stat API（getStatsData）から
-  - 在留外国人統計（都道府県別）
-  - 人口推計（都道府県 総人口）
-を取得し、都道府県別の「外国人数(最新時点)・総人口(最新時点)・比率」を
-data/foreign_residents.json に出力する。
+e-Stat API（getStatsData）で 人口推計（都道府県 総人口）を取得し、
+都道府県別の総人口（最新時点）を data/population.json に出力する。
+
+運用方針（第3便で確定）:
+    - 総人口（都道府県）: e-Stat API で自動更新（本スクリプト）。
+    - 在留外国人（都道府県・市区町村）: 現行データが e-Stat API DB に未整備
+      （都道府県別 在留外国人の DB 表は2017年まで）。Excel から手動更新する。
 
 使い方:
     export ESTAT_APP_ID=<アプリケーションID>          # コード直書き禁止。Secrets/環境変数で渡す
-    python build_data.py                              # JSON生成
+    python build_data.py                              # population.json 生成
     python build_data.py --discover                   # 正しいstatsDataIdを探す（getStatsList）
     python build_data.py --selftest                   # API不要のオフライン自己テスト
-
-スコープ（重要）:
-    今回は都道府県レベルのみ。市区町村はAPI対象外。
 
 statsDataId について（必読）:
     各統計表ページの「API」ボタンに出る statsDataId と、URL の statdisp_id は
@@ -276,20 +275,19 @@ def parse_overrides(env):
 
 
 def build():
-    print("== 在留外国人（都道府県別） ==")
-    zclass, zval = fetch_all(ZAIRYU_STATS_ID)
-    foreign_raw, ftime, funit = extract_latest_pref(zclass, zval, parse_overrides(ZAIRYU_TOTALS))
-    print(f"  → {len(foreign_raw)} 都道府県 / 最新時点 {ftime} / 単位 {funit}")
-    foreign = {k: to_persons(v, funit) for k, v in foreign_raw.items()}
+    """都道府県別の総人口のみを e-Stat API で自動更新し data/population.json に出力。
 
-    print("== 総人口（都道府県別） ==")
+    在留外国人（都道府県・市区町村）は現行データが e-Stat API DB に未整備のため
+    本スクリプトでは扱わない（Excel から手動更新する運用）。
+    """
+    print("== 総人口（都道府県別・e-Stat 自動更新） ==")
     pclass, pval = fetch_all(POP_STATS_ID)
     pop_raw, ptime, punit = extract_latest_pref(pclass, pval, parse_overrides(POP_TOTALS))
     print(f"  → {len(pop_raw)} 都道府県 / 最新時点 {ptime} / 単位 {punit}")
     pop = {k: to_persons(v, punit) for k, v in pop_raw.items()}
 
     names = {}
-    for code5, name in {**area_name_map(zclass), **area_name_map(pclass)}.items():
+    for code5, name in area_name_map(pclass).items():
         pc = pref_code_from_area(code5)
         if pc:
             names[pc] = name
@@ -297,39 +295,34 @@ def build():
     prefs, missing = [], []
     for i in range(1, 48):
         code = f"{i:02d}"
-        f, p = foreign.get(code), pop.get(code)
-        ratio = round(f / p * 100, 3) if (f and p) else None
-        if f is None or p is None:
+        p = pop.get(code)
+        if p is None:
             missing.append(code)
-        prefs.append({"code": code, "name": names.get(code, PREF_NAMES[i - 1]),
-                      "foreign": f, "pop": p, "ratio": ratio})
+        prefs.append({"code": code, "name": names.get(code, PREF_NAMES[i - 1]), "pop": p})
 
     out = {
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S+09:00"),
         "scope": "prefecture",
+        "metric": "population",
         "source": {
-            "foreign": {"provider": "出入国在留管理庁 在留外国人統計（e-Stat API）",
-                        "statsDataId": ZAIRYU_STATS_ID, "time": ftime, "unit": funit},
             "population": {"provider": "総務省 人口推計（e-Stat API）",
                            "statsDataId": POP_STATS_ID, "time": ptime, "unit": punit},
         },
-        "note": "比率＝在留外国人数(最新時点) ÷ 総人口(最新時点) × 100。両者の時点が数か月ずれるため概算。"
-                "都道府県レベルのみ（市区町村はAPI対象外）。",
+        "note": "都道府県別の総人口のみ e-Stat API で自動更新。"
+                "在留外国人（都道府県・市区町村）は API DB 未整備のため Excel から手動更新。",
         "prefs": prefs,
     }
     out_dir = Path("data")
     out_dir.mkdir(exist_ok=True)
-    out_path = out_dir / "foreign_residents.json"
+    out_path = out_dir / "population.json"
     out_path.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    valid = sum(1 for p in prefs if p["ratio"] is not None)
-    print(f"OK: wrote {out_path}  （比率算出 {valid}/47 都道府県, foreign時点={ftime}, pop時点={ptime}）")
+    valid = sum(1 for p in prefs if p["pop"] is not None)
+    print(f"OK: wrote {out_path}  （{valid}/47 都道府県, pop時点={ptime}, 単位={punit}）")
     if missing:
         print(f"WARN: 欠損 {len(missing)} 件: {missing}")
-    # サニティチェック: 比率が常識的な範囲か（0〜30%目安）
-    for p in sorted((p for p in prefs if p["ratio"] is not None), key=lambda x: -x["ratio"])[:3]:
-        flag = "  ⚠️範囲外" if p["ratio"] > 30 else ""
-        print(f"  例 {p['name']}: 外国人{p['foreign']:,} / 人口{p['pop']:,} / {p['ratio']}%{flag}")
+    for p in sorted((p for p in prefs if p["pop"]), key=lambda x: -x["pop"])[:3]:
+        print(f"  例 {p['name']}: 人口{p['pop']:,}")
 
 
 def discover():

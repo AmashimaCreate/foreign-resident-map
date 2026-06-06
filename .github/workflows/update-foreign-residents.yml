@@ -60,18 +60,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: foreign_residents_json
-          path: data/foreign_residents.json
+          name: population_json
+          path: data/population.json
           if-no-files-found: ignore
 
       - name: Commit if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/foreign_residents.json
+          git add data/population.json
           if git diff --staged --quiet; then
             echo "No changes."
           else
-            git commit -m "chore: update foreign residents data ($(date +%Y-%m-%d))"
+            git commit -m "chore: update prefecture population data ($(date +%Y-%m-%d))"
             git push
           fi
