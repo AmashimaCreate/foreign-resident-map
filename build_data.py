@@ -127,6 +127,10 @@ def fetch_all(stats_id):
         status = root.get("RESULT", {}).get("STATUS")
         if status != 0:
             msg = root.get("RESULT", {}).get("ERROR_MSG", "")
+            if status == 100:  # 認証失敗。値は出さず長さだけ表示（正しいappIdは通常40文字）
+                sys.exit(f"ERROR: e-Stat 認証失敗 status=100（{msg}）。"
+                         f" 受け取った appId は {len(APP_ID)} 文字（正しいIDは通常40文字の16進）。"
+                         f" Secret ESTAT_APP_ID の値を確認してください（IDのみ・前後やURL・=等を含めない）。")
             sys.exit(f"ERROR: e-Stat API status={status} {msg} (statsDataId={stats_id})")
         sd = root["STATISTICAL_DATA"]
         if class_objs is None:
