@@ -333,8 +333,8 @@ def discover():
     if not APP_ID:
         sys.exit("ERROR: ESTAT_APP_ID 未設定。")
     searches = [
-        ("在留外国人 (statsCode=%s)" % ZAIRYU_STATS_CODE, {"statsCode": ZAIRYU_STATS_CODE, "searchWord": "都道府県"}),
-        ("人口推計 (statsCode=%s)" % POP_STATS_CODE, {"statsCode": POP_STATS_CODE, "searchWord": "都道府県"}),
+        ("在留外国人 (statsCode=%s 国籍)" % ZAIRYU_STATS_CODE, {"statsCode": ZAIRYU_STATS_CODE, "searchWord": "国籍"}),
+        ("人口推計 (statsCode=%s 都道府県)" % POP_STATS_CODE, {"statsCode": POP_STATS_CODE, "searchWord": "都道府県"}),
     ]
     for label, extra in searches:
         params = {"appId": APP_ID, "lang": "J", "limit": "100"}
@@ -346,14 +346,15 @@ def discover():
             print(f"### {label}: ERROR status={st} {gl.get('RESULT', {}).get('ERROR_MSG', '')}")
             continue
         tables = as_list(gl.get("DATALIST_INF", {}).get("TABLE_INF"))
-        print(f"\n### {label}: {len(tables)} 表")
+        tables.sort(key=lambda t: str(t.get("@id")), reverse=True)  # 新しいID順
+        print(f"\n### {label}: {len(tables)} 表（新しいID順）")
         for t in tables:
             tid = t.get("@id")
             survey = t.get("SURVEY_DATE")
+            opened = t.get("OPEN_DATE")
             n = t.get("OVERALL_TOTAL_NUMBER")
             title = gx(t.get("TITLE"))
-            sname = gx(t.get("STATISTICS_NAME"))
-            print(f"  id={tid}  survey={survey}  n={n}\n      {sname} | {title}")
+            print(f"  id={tid}  open={opened}  survey={survey}  n={n} | {title}")
 
 
 # --------------------------------------------------------------------------
