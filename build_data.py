@@ -40,11 +40,11 @@ import urllib.error
 from pathlib import Path
 
 BASE = os.environ.get("ESTAT_BASE", "https://api.e-stat.go.jp/rest/3.0/app/json/getStatsData")
-APP_ID = os.environ.get("ESTAT_APP_ID")
+APP_ID = (os.environ.get("ESTAT_APP_ID") or "").strip()  # 貼り付け時の改行/空白を除去
 
 # 既定は statdisp_id（実 statsDataId が異なる場合は環境変数で上書き）
-ZAIRYU_STATS_ID = os.environ.get("ZAIRYU_STATS_ID") or "0003147229"
-POP_STATS_ID = os.environ.get("POP_STATS_ID") or "0004010044"
+ZAIRYU_STATS_ID = (os.environ.get("ZAIRYU_STATS_ID") or "").strip() or "0003147229"
+POP_STATS_ID = (os.environ.get("POP_STATS_ID") or "").strip() or "0004010044"
 
 # 総数コードの手動上書き（ヒューリスティックが外した時用）: JSON {"classId":"code"}
 ZAIRYU_TOTALS = os.environ.get("ZAIRYU_TOTALS")
