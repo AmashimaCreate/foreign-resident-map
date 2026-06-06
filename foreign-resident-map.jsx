@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import MunicipalityView from "./MunicipalityView.jsx";
 
 /* =========================================================================
    外国人比率マップ（実データ版）
@@ -50,6 +51,7 @@ const NAT_COLORS=["#c0392b","#e67e22","#f1c40f","#27ae60","#16a085","#2980b9","#
 export default function App(){
   const [sel,setSel]=useState(DATA.prefs.find(p=>p.name==="東京都"));
   const [metric,setMetric]=useState("ratio"); // ratio | count | growth
+  const [showMuni,setShowMuni]=useState(false); // 市区町村ドリルダウン（別データ・別コンポーネント）
 
   const maxRatio=useMemo(()=>Math.max(...DATA.prefs.map(ratio)),[]);
   const maxCount=useMemo(()=>Math.max(...DATA.prefs.map(p=>p.series[LATEST])),[]);
@@ -148,6 +150,11 @@ export default function App(){
               <Stat label="総人口(24.10)" value={yen(sel.pop)} small />
               <Stat label="増減(23.12→25.6)" value={"+"+selGrowth.toFixed(1)+"%"} small />
             </div>
+            <button onClick={()=>setShowMuni(true)}
+              style={{width:"100%", marginBottom:12, padding:"9px 12px", borderRadius:8, cursor:"pointer",
+                border:"1px solid #7f0000", background:"#7f0000", color:"#fff", fontSize:13, fontWeight:700}}>
+              🔍 {sel.name}の市区町村を見る
+            </button>
             <div style={{fontSize:11, color:"#666", marginBottom:2}}>在留外国人数の推移（実数・4時点）</div>
             <ResponsiveContainer width="100%" height={150}>
               <BarChart data={selTrend} margin={{top:6,right:4,left:0,bottom:0}}>
@@ -224,6 +231,8 @@ export default function App(){
           帰化者数2023〜24は暫定値。市区町村別・国籍内訳は今後追加予定。
         </div>
       </div>
+
+      {showMuni && <MunicipalityView pref={sel} onClose={()=>setShowMuni(false)} />}
     </div>
   );
 }
