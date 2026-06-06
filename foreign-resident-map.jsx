@@ -78,6 +78,8 @@ export default function App(){
   const [showMuni,setShowMuni]=useState(false); // 市区町村ドリルダウン（別データ・別コンポーネント）
   const narrow=useIsNarrow(); // スマホ幅判定（レイアウトのみ）
   const [mapStyle,setMapStyle]=useState("real"); // real(リアル地図SVG) | tile(タイル地図)
+  const [summaryOpen,setSummaryOpen]=useState(true); // 全国サマリーの開閉
+  const [muniSummary,setMuniSummary]=useState(null); // 市区町村の全国最高/最低（municipalities.jsonを動的import）
   const detailRef=useRef(null);
   const selectPref=(p)=>{ // 県を選択→スマホ(縦積み)では詳細パネルへ"ぬるっと"スクロール
     setSel(p);
@@ -86,6 +88,24 @@ export default function App(){
       smoothScrollToY(y, 480);
     }
   };
+
+  // 市区町村の全国最高/最低を算出（168KBは動的import＝ドリルダウンと同一チャンク。政令市/特別区は区に展開）
+  useEffect(()=>{
+    let alive=true;
+    import("./municipalities.json").then(m=>{
+      if(!alive) return;
+      const data=m.default||m, units=[];
+      for(const p of data.prefs){ for(const mu of p.munis){
+        const list=(mu.wards&&mu.wards.length)?mu.wards:[mu];
+        for(const u of list){ if(u.ratio!=null&&u.foreign!=null) units.push({name:u.name, pref:p.name, ratio:u.ratio, foreign:u.foreign}); }
+      }}
+      if(!units.length) return;
+      const byR=[...units].sort((a,b)=>b.ratio-a.ratio);
+      const byC=[...units].sort((a,b)=>b.foreign-a.foreign);
+      setMuniSummary({ratioHi:byR[0], ratioLo:byR[byR.length-1], countHi:byC[0], countLo:byC[byC.length-1]});
+    }).catch(()=>{});
+    return ()=>{alive=false;};
+  },[]);
 
   const maxRatio=useMemo(()=>Math.max(...DATA.prefs.map(ratio)),[]);
   const maxCount=useMemo(()=>Math.max(...DATA.prefs.map(p=>p.series[LATEST])),[]);
@@ -134,16 +154,43 @@ export default function App(){
           </div>
         </div>
 
-        {/* 全国サマリー（2025年6月末） */}
+        {/* 全国サマリー（2025年6月末・開閉可） */}
         <div style={{background:"#fff", borderRadius:10, padding:16, boxShadow:"0 1px 3px rgba(0,0,0,.08)", marginBottom:18}}>
-          <h2 style={{margin:"0 0 10px", fontSize:17}}>全国サマリー　<span style={{fontSize:12, color:"#888"}}>2025年6月末</span></h2>
-          <div style={{display:"grid", gridTemplateColumns: narrow?"1fr 1fr":"1.4fr 1fr 1fr 1fr 1fr", gap:8}}>
-            <SummaryStat label="在留外国人 累計" value={yen(totalForeign)+"人"} accent/>
-            <SummaryStat label="比率 最高" name={ratioHi.name} value={ratio(ratioHi).toFixed(2)+"%"} onClick={()=>selectPref(ratioHi)}/>
-            <SummaryStat label="比率 最低" name={ratioLo.name} value={ratio(ratioLo).toFixed(2)+"%"} onClick={()=>selectPref(ratioLo)}/>
-            <SummaryStat label="人数 最多" name={countHi.name} value={yen(countHi.series[LATEST])+"人"} onClick={()=>selectPref(countHi)}/>
-            <SummaryStat label="人数 最少" name={countLo.name} value={yen(countLo.series[LATEST])+"人"} onClick={()=>selectPref(countLo)}/>
+          <div onClick={()=>setSummaryOpen(o=>!o)}
+            style={{display:"flex", justifyContent:"space-between", alignItems:"center", cursor:"pointer"}}>
+            <h2 style={{margin:0, fontSize:17}}>全国サマリー　<span style={{fontSize:12, color:"#888"}}>2025年6月末</span></h2>
+            <span style={{fontSize:13, color:"#888"}}>{summaryOpen?"▲ 閉じる":"▼ 開く"}</span>
           </div>
+          {summaryOpen && (
+            <div style={{marginTop:12}}>
+              {/* 累計：横一列で大きく */}
+              <div style={{background:"#f4f1ea", borderRadius:8, padding:"12px 14px", marginBottom:12,
+                display:"flex", alignItems:"baseline", justifyContent:"center", gap:12, flexWrap:"wrap"}}>
+                <span style={{fontSize:13, color:"#888"}}>在留外国人 累計（全国）</span>
+                <span style={{fontSize:26, fontWeight:800, letterSpacing:.5}}>{yen(totalForeign)}<span style={{fontSize:15, fontWeight:700}}>人</span></span>
+              </div>
+              {/* 都道府県：高い(左)／低い(右) */}
+              <div style={{fontSize:12, color:"#888", margin:"0 2px 6px"}}>都道府県</div>
+              <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:14}}>
+                <SummaryStat label="比率 最高" name={ratioHi.name} value={ratio(ratioHi).toFixed(2)+"%"} onClick={()=>selectPref(ratioHi)}/>
+                <SummaryStat label="比率 最低" name={ratioLo.name} value={ratio(ratioLo).toFixed(2)+"%"} onClick={()=>selectPref(ratioLo)}/>
+                <SummaryStat label="人数 最多" name={countHi.name} value={yen(countHi.series[LATEST])+"人"} onClick={()=>selectPref(countHi)}/>
+                <SummaryStat label="人数 最少" name={countLo.name} value={yen(countLo.series[LATEST])+"人"} onClick={()=>selectPref(countLo)}/>
+              </div>
+              {/* 市区町村：高い(左)／低い(右)（区を展開した全国） */}
+              <div style={{fontSize:12, color:"#888", margin:"0 2px 6px"}}>市区町村（区を含む）</div>
+              {muniSummary ? (
+                <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:8}}>
+                  <SummaryStat label="比率 最高" name={muniSummary.ratioHi.pref+" "+muniSummary.ratioHi.name} value={muniSummary.ratioHi.ratio.toFixed(2)+"%"}/>
+                  <SummaryStat label="比率 最低" name={muniSummary.ratioLo.pref+" "+muniSummary.ratioLo.name} value={muniSummary.ratioLo.ratio.toFixed(2)+"%"}/>
+                  <SummaryStat label="人数 最多" name={muniSummary.countHi.pref+" "+muniSummary.countHi.name} value={yen(muniSummary.countHi.foreign)+"人"}/>
+                  <SummaryStat label="人数 最少" name={muniSummary.countLo.pref+" "+muniSummary.countLo.name} value={yen(muniSummary.countLo.foreign)+"人"}/>
+                </div>
+              ) : (
+                <div style={{fontSize:12, color:"#aaa", padding:"6px 2px"}}>読み込み中…</div>
+              )}
+            </div>
+          )}
         </div>
 
         <div style={{display:"grid", gridTemplateColumns: narrow?"1fr":"1.3fr 1fr", gap:18, alignItems:"start"}}>
@@ -322,7 +369,7 @@ function SummaryStat({label, name, value, accent, onClick}){
 
 function Stat({label,value,accent,small}){
   return (
-    <div style={{flex:small?"1 1 45%":1, background:accent?"#7f0000":"#f4f1ea",
+    <div style={{flex:small?"1 1 45%":1, background:accent?"#3f5366":"#f4f1ea",
       color:accent?"#fff":"#333", borderRadius:8, padding:"7px 6px", textAlign:"center", minWidth:70}}>
       <div style={{fontSize:11, opacity:.8}}>{label}</div>
       <div style={{fontSize:small?15:17, fontWeight:700, marginTop:2}}>{value}</div>

@@ -75,12 +75,15 @@ export default function MunicipalityView({ pref, onClose }) {
 
   // ---- styles ----
   const overlay = {
+    // 上揃え＋スクロール可。スマホでURLバー分の高さで上部が見切れるのを防ぐ
     position: "fixed", inset: 0, background: "rgba(0,0,0,.45)", zIndex: 1000,
-    display: "flex", alignItems: "center", justifyContent: "center", padding: 16,
+    display: "flex", alignItems: "flex-start", justifyContent: "center",
+    padding: "16px", overflowY: "auto",
     fontFamily: "'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif",
   };
   const panel = {
-    background: "#f4f1ea", borderRadius: 12, width: "min(920px, 96vw)", maxHeight: "92vh",
+    // dvh＝実際に見えている高さ基準。ヘッダーが必ず見えるよう上揃え＋これで収める
+    background: "#f4f1ea", borderRadius: 12, width: "min(920px, 96vw)", maxHeight: "calc(100dvh - 32px)",
     display: "flex", flexDirection: "column", overflow: "hidden", color: "#1a1a1a",
     boxShadow: "0 10px 40px rgba(0,0,0,.35)",
   };
@@ -224,7 +227,7 @@ export default function MunicipalityView({ pref, onClose }) {
 
 function Stat({ label, value, accent, small }) {
   return (
-    <div style={{ background: accent ? "#7f0000" : "#fff", color: accent ? "#fff" : "#333",
+    <div style={{ background: accent ? "#3f5366" : "#fff", color: accent ? "#fff" : "#333",
       borderRadius: 8, padding: "6px 10px", textAlign: "center", minWidth: 64,
       border: accent ? "none" : "1px solid #e6e0d2" }}>
       <div style={{ fontSize: 9, opacity: .75 }}>{label}</div>
