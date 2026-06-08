@@ -65,6 +65,9 @@ jobs:
           if-no-files-found: ignore
 
       - name: Commit if changed
+        env:
+          # Cloudflare Pages の Deploy Hook URL（秘密情報）。Secret 経由で参照し、コードに直書きしない。
+          CF_DEPLOY_HOOK_URL: ${{ secrets.CF_DEPLOY_HOOK_URL }}
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -74,4 +77,11 @@ jobs:
           else
             git commit -m "chore: update prefecture population data ($(date +%Y-%m-%d))"
             git push
+            # データが更新された時だけ Cloudflare Pages をリビルドし seiji-mieru.com/zairyu/ に反映。
+            # Secret 未設定なら空振り（URL はログに出さない）。
+            if [ -n "${CF_DEPLOY_HOOK_URL:-}" ]; then
+              curl -fsS -X POST "$CF_DEPLOY_HOOK_URL" > /dev/null && echo "Cloudflare rebuild triggered"
+            else
+              echo "CF_DEPLOY_HOOK_URL 未設定 → リビルドはスキップ"
+            fi
           fi
