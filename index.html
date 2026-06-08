@@ -23,8 +23,31 @@
     <meta name="twitter:title" content="外国人比率マップ" />
     <meta name="twitter:description" content="日本全国・在留外国人の比率・人数・増減を都道府県別に地図とグラフで可視化。" />
     <meta name="twitter:image" content="https://seiji-mieru.com/zairyu/og-image.jpg" />
+
+    <!-- 政治見える化 戻り導線バー -->
+    <style>
+      .hubbar{display:flex;align-items:center;gap:9px;height:42px;padding:0 18px;font-size:.8rem;background:#ece5d6;border-bottom:1px solid #ddd4c2;font-family:'Zen Kaku Gothic New',system-ui,-apple-system,sans-serif;color:#1a1a1a}
+      .hubbar .hb-brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:#1a1a1a;text-decoration:none}
+      .hubbar .hb-brand svg{width:19px;height:19px;display:block;flex:none}
+      .hubbar .hb-brand:hover{text-decoration:underline}
+      .hubbar .hb-sep{color:#8a8275;opacity:.75;font-size:.9rem}
+      .hubbar .hb-cur{font-weight:700;color:#2f6fb0}
+      .hubbar .hb-soc{margin-left:auto;display:flex;gap:11px;align-items:center}
+      .hubbar .hb-soc a{color:#857c6e;text-decoration:none;display:inline-flex;align-items:center;gap:4px;font-size:.74rem;font-weight:600}
+      .hubbar .hb-soc a:hover{color:#2f6fb0}
+      .hubbar .hb-soc svg{width:12px;height:12px}
+      @media(max-width:560px){.hubbar{padding:0 14px;gap:7px}}
+    </style>
   </head>
   <body>
+    <header class="hubbar">
+      <a class="hb-brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#dbe9f6"/><g><rect x="20" y="40" width="24" height="3.5" rx="1" fill="#2f5d8c"/><g fill="#3a78b5"><rect x="22" y="31" width="2.6" height="9"/><rect x="27" y="31" width="2.6" height="9"/><rect x="33" y="31" width="2.6" height="9"/><rect x="39" y="31" width="2.6" height="9"/></g><rect x="20" y="29" width="24" height="2.4" fill="#2f5d8c"/><path d="M20 29 L32 23 L44 29 Z" fill="#3a78b5"/></g><circle cx="30" cy="31" r="11" fill="none" stroke="#1f4e8f" stroke-width="2.6"/><line x1="38" y1="39" x2="45" y2="46" stroke="#1f4e8f" stroke-width="4" stroke-linecap="round"/></svg>政治見える化</a>
+      <span class="hb-sep">›</span><span class="hb-cur">外国人マップ</span>
+      <span class="hb-soc">
+        <a href="https://note.com/seiji_mieru" target="_blank" rel="noopener">note ↗</a>
+        <a href="https://x.com/seiji_mieru" target="_blank" rel="noopener" aria-label="X（@seiji_mieru）"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.4 8.4L23.2 22H16l-5-6.6L5.3 22H2l7.9-9L1.2 2H8.5l4.5 6L18.9 2z"/></svg></a>
+      </span>
+    </header>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
