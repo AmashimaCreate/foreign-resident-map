@@ -23,10 +23,6 @@ on:
         description: "discover時の自由検索語（getStatsList searchWord）"
         required: false
         default: ""
-      test_deploy_hook:
-        description: "true なら Cloudflare Deploy Hook の疎通テストのみ（データ生成は行わない）"
-        required: false
-        default: "false"
 
 permissions:
   contents: write
@@ -47,7 +43,6 @@ jobs:
 
       # 依存なし（urllib/json の標準ライブラリのみ）。appId はコード直書きせず Secrets から。
       - name: Generate data from e-Stat API
-        if: ${{ github.event.inputs.test_deploy_hook != 'true' }}
         env:
           ESTAT_APP_ID: ${{ secrets.ESTAT_APP_ID }}
           ZAIRYU_STATS_ID: ${{ github.event.inputs.zairyu_stats_id }}
@@ -90,12 +85,3 @@ jobs:
               echo "CF_DEPLOY_HOOK_URL 未設定 → リビルドはスキップ"
             fi
           fi
-
-      # --- 一時的な疎通テスト用（確認後に削除する） ---
-      - name: Test Cloudflare deploy hook (manual)
-        if: ${{ github.event.inputs.test_deploy_hook == 'true' }}
-        env:
-          CF_DEPLOY_HOOK_URL: ${{ secrets.CF_DEPLOY_HOOK_URL }}
-        run: |
-          if [ -z "${CF_DEPLOY_HOOK_URL:-}" ]; then echo "CF_DEPLOY_HOOK_URL 未設定"; exit 1; fi
-          curl -fsS -X POST "$CF_DEPLOY_HOOK_URL" > /dev/null && echo "✓ Cloudflare rebuild triggered (test)"
