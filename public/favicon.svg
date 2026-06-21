@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="政治見える化">
+  <defs>
+    <clipPath id="ring"><circle cx="32" cy="32" r="31"/></clipPath>
+  </defs>
+
+  <!-- 円の背景 -->
+  <circle cx="32" cy="32" r="31" fill="#eaf2fa"/>
+
+  <g clip-path="url(#ring)">
+    <!-- 都市シルエット（下部・淡い） -->
+    <g fill="#b7d2cf">
+      <rect x="2"  y="46" width="7" height="14"/>
+      <rect x="10" y="42" width="6" height="18"/>
+      <rect x="47" y="44" width="6" height="16"/>
+      <rect x="54" y="48" width="8" height="12"/>
+    </g>
+
+    <!-- 棒グラフ（左上・上昇） -->
+    <rect x="6"  y="22" width="4.5" height="9"  rx="1" fill="#74b98a"/>
+    <rect x="11.5" y="17" width="4.5" height="14" rx="1" fill="#4a9e63"/>
+    <rect x="17" y="12" width="4.5" height="19" rx="1" fill="#3a78b5"/>
+
+    <!-- 円グラフ（右上） -->
+    <g transform="translate(48,16)">
+      <circle r="7.5" fill="#5aa0d6"/>
+      <path d="M0 0 V-7.5 A7.5 7.5 0 0 1 6.5 3.7 Z" fill="#2f9e8f"/>
+      <path d="M0 0 L6.5 3.7 A7.5 7.5 0 0 1 -3.7 6.5 Z" fill="#2f6fb0"/>
+    </g>
+  </g>
+
+  <!-- 議事堂 -->
+  <g>
+    <!-- 土台・階段 -->
+    <rect x="17" y="44" width="30" height="4.5" rx="1" fill="#2f5d8c"/>
+    <!-- 柱 -->
+    <g fill="#3a78b5">
+      <rect x="19.5" y="34" width="3" height="10"/>
+      <rect x="24.5" y="34" width="3" height="10"/>
+      <rect x="30.5" y="34" width="3" height="10"/>
+      <rect x="36.5" y="34" width="3" height="10"/>
+      <rect x="41.5" y="34" width="3" height="10"/>
+    </g>
+    <!-- 梁 -->
+    <rect x="17" y="31.5" width="30" height="3" fill="#2f5d8c"/>
+    <!-- ペディメント -->
+    <path d="M17 31.5 L32 25 L47 31.5 Z" fill="#3a78b5"/>
+    <!-- ドーム -->
+    <path d="M26.5 25 Q32 17 37.5 25 Z" fill="#2f5d8c"/>
+    <rect x="31" y="14.5" width="2" height="3.5" fill="#2f5d8c"/>
+    <circle cx="32" cy="14" r="1.6" fill="#2f5d8c"/>
+  </g>
+
+  <!-- 虫眼鏡（議事堂を覗く） -->
+  <g>
+    <circle cx="30" cy="33" r="14" fill="#ffffff" fill-opacity="0.18" stroke="#1f4e8f" stroke-width="3.2"/>
+    <line x1="40" y1="43" x2="49" y2="52" stroke="#1f4e8f" stroke-width="5.2" stroke-linecap="round"/>
+  </g>
+</svg>
